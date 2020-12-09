@@ -4,7 +4,7 @@ const eaWrap = require('express-async-handler');
 const crypto = require('crypto');
 const { v4: uuid } = require('uuid');
 
-const { BadRequest, NotFound } = require('../handler');
+const { BadRequest, Unauthorized } = require('../handler');
 const { User } = require('../db');
 const { upload, uploadExtChecker, uploadPath } = require('../upload');
 
@@ -70,7 +70,7 @@ router.post(
                 attributes: ['id']
             }
         );
-        if (!res) throw new NotFound('user not found');
+        if (!res) throw new Unauthorized();
 
         resp.sendStatus(200);
     })

@@ -31,6 +31,17 @@ class NotFound extends GeneralError {
     }
 }
 
+class Unauthorized extends GeneralError {
+    constructor(message) {
+        super();
+        this.message = message ?? 'Unauthorized';
+    }
+
+    get statusCode() {
+        return 401;
+    }
+}
+
 // eslint-disable-next-line no-unused-vars
 const customExceptionHandler = (err, _req, resp, _next) => {
     resp.status(err.statusCode ?? 500);
@@ -42,5 +53,6 @@ module.exports = {
     customExceptionHandler,
     GeneralError,
     BadRequest,
+    Unauthorized,
     NotFound
 };
