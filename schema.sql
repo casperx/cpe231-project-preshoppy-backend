@@ -54,7 +54,7 @@ CREATE TABLE `user_address` (
   CONSTRAINT `user_address_ibfk_1` FOREIGN KEY (`u_id`) REFERENCES `user` (`u_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO user_role (ur_name) VALUES
+INSERT INTO user_role (ur_detail) VALUES
   ('Admin'),
   ('Supporter'),
   ('Buyer'),
