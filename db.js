@@ -97,6 +97,84 @@ const User = sequelize.define(
     }
 );
 
+const Transaction = sequelize.define(
+    'Transaction',
+    {
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 't_id' },
+
+        timestamp: { type: DataTypes.DATE, allowNull: false, field: 't_timestamp', defaultValue: () => sequelize.fn('NOW') },
+        status: { type: DataTypes.INTEGER, allowNull: false, field: 't_status', defaultValue: 1 },
+
+        evidencePic: { type: DataTypes.STRING(100), field: 't_evidence_pic' },
+
+        address: { type: DataTypes.STRING(500), allowNull: false, field: 't_address' },
+        tracking: { type: DataTypes.STRING, field: 't_tracking' }
+    },
+    {
+        tableName: 'transaction'
+    }
+);
+
+const TransactionItem = sequelize.define(
+    'TransactionItem',
+    {
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'ti_id' },
+
+        name: { type: DataTypes.STRING, allowNull: false, field: 'ti_name' },
+        detail: { type: DataTypes.STRING(500), allowNull: false, field: 'ti_detail' },
+        price: { type: DataTypes.FLOAT, allowNull: false, field: 'ti_price' },
+
+        quantity: { type: DataTypes.INTEGER, allowNull: false, field: 'ti_quantity' },
+    },
+    {
+        tableName: 'transaction_item'
+    }
+);
+
+const Matching = sequelize.define(
+    'Matching',
+    {
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'ti_id' },
+
+        name: { type: DataTypes.STRING, allowNull: false, field: 'ti_name' },
+        detail: { type: DataTypes.STRING(500), allowNull: false, field: 'ti_detail' },
+        price: { type: DataTypes.FLOAT, allowNull: false, field: 'ti_price' },
+
+        quantity: { type: DataTypes.INTEGER, allowNull: false, field: 'ti_quantity' },
+    },
+    {
+        tableName: 'matching'
+    }
+);
+
+Transaction.hasMany(
+    TransactionItem,
+    {
+        foreignKey: { name: 'transaction', field: 't_id' },
+    }
+);
+
+User.hasMany(
+    Transaction,
+    {
+        foreignKey: { name: 'buyer', allowNull: false, field: 'u_buyer_id' },
+    }
+);
+
+User.hasMany(
+    Transaction,
+    {
+        foreignKey: { name: 'seller', allowNull: false, field: 'u_seller_id' },
+    }
+);
+
+Event.hasMany(
+    Transaction,
+    {
+        foreignKey: { name: 'event', allowNull: false, field: 'e_id' },
+    }
+);
+
 User.hasMany(
     UserAddress,
     {
@@ -107,7 +185,7 @@ User.hasMany(
 User.belongsTo(
     UserAddress,
     {
-        foreignKey: { name: 'address', field: 'ua_id' },
+        foreignKey: { name: 'preferredAdress', field: 'ua_id' },
         constraints: false
     }
 );
@@ -126,10 +204,38 @@ UserVendorStatus.hasMany(
     }
 );
 
+setTimeout(
+    async () => {
+        await sequelize.sync();
+        if (await UserRole.count({ attributes: ['id'] }) === 0)
+            await UserRole.bulkCreate(
+                [
+                    { detail: 'Admin' },
+                    { detail: 'Supporter' },
+                    { detail: 'Buyer' },
+                    { detail: 'Seller' },
+                ]
+            );
+        if (await UserVendorStatus.count({ attributes: ['id'] }) === 0)
+            await UserVendorStatus.bulkCreate(
+                [
+                    { name: 'not request', detail: 'not request' },
+                    { name: 'request pending', detail: 'Your request is pending for our Supporter to inspect.' },
+                    { name: 'request granted', detail: 'Your request has been granted. You are seller now.' },
+                    { name: 'request rejected', detail: 'Your request has been rejected. Please review your information again.' }
+                ]
+            );
+    },
+    2000
+);
+
 module.exports = {
     Event,
     User,
     UserRole,
     UserAddress,
-    UserVendorStatus
+    UserVendorStatus,
+    Transaction,
+    TransactionItem,
+    Matching
 };

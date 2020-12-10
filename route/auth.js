@@ -10,7 +10,7 @@ const { upload, uploadExtChecker, uploadPath } = require('../upload');
 
 const router = Router();
 
-/* event pic path generator */
+/* profile pic path generator */
 const profilePicPath = (fileName) => path.join(uploadPath, 'profile_pic', fileName);
 
 const uploadPicExtsOpts = {
@@ -28,6 +28,23 @@ router.post(
         if (!email || !password || !firstName || !lastName || !tel)
             throw new BadRequest('required field is missing');
 
+        const cleanEmail = email.trim(),
+            cleanPassword = password.trim(),
+            cleanFirstName = firstName.trim(),
+            cleanLastName = lastName.trim(),
+            cleanTel = tel.trim();
+
+        if (!cleanEmail || !cleanPassword || !cleanFirstName || !cleanLastName || !cleanTel)
+            throw new BadRequest('required field is empty');
+
+        const emailExists = await User.findOne(
+            {
+                where: { email: cleanEmail }
+            }
+        );
+
+        if (emailExists) throw new BadRequest('email is already used');
+
         /* upload profile picture */
         const dotFileExt = uploadExtChecker(profilePic.name, uploadPicExtsOpts);
         if (!dotFileExt) throw new BadRequest('file extension is not allowed');
@@ -36,14 +53,14 @@ router.post(
         await upload(profilePic, profilePicPath(profilePicFileName));
 
         const hasher = crypto.createHash('SHA3-512');
-        const hashedPassword = hasher.update(password).digest('hex');
+        const hashedPassword = hasher.update(cleanPassword).digest('hex');
         await User.create(
             {
-                email,
+                email: cleanEmail,
                 password: hashedPassword,
-                firstName,
-                lastName,
-                tel,
+                firstName: cleanFirstName,
+                lastName: cleanLastName,
+                tel: cleanTel,
                 profilePic: profilePicFileName
             }
         );
@@ -72,7 +89,24 @@ router.post(
         );
         if (!res) throw new Unauthorized();
 
-        resp.sendStatus(200);
+        resp.status(200).json(res);
+    })
+);
+
+router.get(
+    '/info/:id',
+    eaWrap(async (req, resp) => {
+        const { id } = req.params;
+
+        const res = await User.findOne(
+            {
+                where: { id },
+                attributes: ['id', 'firstName', 'lastName', 'email', 'profilePic']
+            }
+        );
+        if (!res) throw new Unauthorized();
+
+        resp.status(200).json(res);
     })
 );
 
