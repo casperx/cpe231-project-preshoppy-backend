@@ -87,7 +87,7 @@ const User = sequelize.define(
 
         tel: { type: DataTypes.STRING(100), allowNull: false, field: 'u_tel' },
 
-        profilePic: { type: DataTypes.STRING(100), allowNull: false, field: 'u_profile_pic' },
+        profilePic: { type: DataTypes.STRING(100), field: 'u_profile_pic' },
 
         idCardPic: { type: DataTypes.STRING(100), field: 'u_id_card_pic' },
         verifyPic: { type: DataTypes.STRING(100), field: 'u_verify_pic' }
@@ -131,19 +131,25 @@ const TransactionItem = sequelize.define(
     }
 );
 
-const Matching = sequelize.define(
-    'Matching',
+const MatchQueue = sequelize.define(
+    'MatchQueue',
     {
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'ti_id' },
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'mq_id' },
 
-        name: { type: DataTypes.STRING, allowNull: false, field: 'ti_name' },
-        detail: { type: DataTypes.STRING(500), allowNull: false, field: 'ti_detail' },
-        price: { type: DataTypes.FLOAT, allowNull: false, field: 'ti_price' },
-
-        quantity: { type: DataTypes.INTEGER, allowNull: false, field: 'ti_quantity' },
+        type: { type: DataTypes.INTEGER, allowNull: false, field: 'mq_type' },
     },
     {
-        tableName: 'matching'
+        tableName: 'match_queue'
+    }
+);
+
+const Match = sequelize.define(
+    'Match',
+    {
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, field: 'm_id' },
+    },
+    {
+        tableName: 'match'
     }
 );
 
@@ -190,6 +196,41 @@ User.belongsTo(
     }
 );
 
+User.hasMany(
+    Match,
+    {
+        foreignKey: { name: 'buyer', allowNull: false, field: 'u_buyer_id' },
+    }
+);
+
+User.hasMany(
+    Match,
+    {
+        foreignKey: { name: 'seller', allowNull: false, field: 'u_seller_id' },
+    }
+);
+
+Event.hasMany(
+    Match,
+    {
+        foreignKey: { name: 'event', allowNull: false, field: 'e_id' },
+    }
+);
+
+User.hasMany(
+    MatchQueue,
+    {
+        foreignKey: { name: 'user', field: 'u_id' },
+    }
+);
+
+Event.hasMany(
+    MatchQueue,
+    {
+        foreignKey: { name: 'event', allowNull: false, field: 'e_id' },
+    }
+);
+
 UserRole.hasMany(
     User,
     {
@@ -206,6 +247,7 @@ UserVendorStatus.hasMany(
 
 setTimeout(
     async () => {
+        /* init database */
         await sequelize.sync();
         if (await UserRole.count({ attributes: ['id'] }) === 0)
             await UserRole.bulkCreate(
@@ -237,5 +279,6 @@ module.exports = {
     UserVendorStatus,
     Transaction,
     TransactionItem,
-    Matching
+    Match,
+    MatchQueue
 };

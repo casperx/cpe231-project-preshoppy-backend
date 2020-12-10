@@ -28,7 +28,7 @@ router.post(
             }
         );
         console.log(buyer);
-        if (buyer.preferredAdress === null) throw new Error('please set default address');
+        if (buyer.preferredAdress === null) throw new BadRequest('please set default address');
         const buyerPreferredAddress = await buyer.getUserAddress(
             {
                 attributes: ['address']
