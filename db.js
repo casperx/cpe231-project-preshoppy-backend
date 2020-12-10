@@ -244,33 +244,30 @@ UserVendorStatus.hasMany(
         foreignKey: { name: 'vendorStatus', allowNull: false, defaultValue: 1, field: 'uvs_id' },
     }
 );
-
+/*
 setTimeout(
     async () => {
-        /* init database */
         await sequelize.sync();
-        if (await UserRole.count({ attributes: ['id'] }) === 0)
-            await UserRole.bulkCreate(
-                [
-                    { detail: 'Admin' },
-                    { detail: 'Supporter' },
-                    { detail: 'Buyer' },
-                    { detail: 'Seller' },
-                ]
-            );
-        if (await UserVendorStatus.count({ attributes: ['id'] }) === 0)
-            await UserVendorStatus.bulkCreate(
-                [
-                    { name: 'not request', detail: 'not request' },
-                    { name: 'request pending', detail: 'Your request is pending for our Supporter to inspect.' },
-                    { name: 'request granted', detail: 'Your request has been granted. You are seller now.' },
-                    { name: 'request rejected', detail: 'Your request has been rejected. Please review your information again.' }
-                ]
-            );
+        await UserRole.bulkCreate(
+            [
+                { detail: 'Admin' },
+                { detail: 'Supporter' },
+                { detail: 'Buyer' },
+                { detail: 'Seller' },
+            ]
+        );
+        await UserVendorStatus.bulkCreate(
+            [
+                { name: 'not request', detail: 'not request' },
+                { name: 'request pending', detail: 'Your request is pending for our Supporter to inspect.' },
+                { name: 'request granted', detail: 'Your request has been granted. You are seller now.' },
+                { name: 'request rejected', detail: 'Your request has been rejected. Please review your information again.' }
+            ]
+        );
     },
     2000
 );
-
+*/
 module.exports = {
     Event,
     User,

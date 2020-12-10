@@ -3,7 +3,7 @@ const eaWrap = require('express-async-handler');
 const crypto = require('crypto');
 
 const { BadRequest, Unauthorized } = require('../handler');
-const { User } = require('../db');
+const { User, UserAddress } = require('../db');
 
 const router = Router();
 
@@ -35,13 +35,26 @@ router.post(
 
         const hasher = crypto.createHash('SHA3-512');
         const hashedPassword = hasher.update(cleanPassword).digest('hex');
-        await User.create(
+        const newUser = await User.create(
             {
                 email: cleanEmail,
                 password: hashedPassword,
                 firstName: cleanFirstName,
                 lastName: cleanLastName,
                 tel: cleanTel
+            }
+        );
+        const newAddress = await UserAddress.create(
+            {
+                name: `Home of ${cleanFirstName} ${cleanLastName}`,
+                tel: cleanTel,
+                address: '123/456 Brooklyn St., Newyork, USA, Zip Code 69696',
+                user: newUser.id
+            }
+        );
+        await newUser.update(
+            {
+                preferredAdress: newAddress.id
             }
         );
         resp.sendStatus(200);

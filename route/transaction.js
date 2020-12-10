@@ -97,13 +97,12 @@ router.post(
         const evidencePicFileName = uuid() + dotFileExt;
         await upload(evidencePic, evidencePicPath(evidencePicFileName));
 
-        transaction.set(
+        await transaction.update(
             {
                 status: 2,
                 evidencePic: evidencePicFileName
             }
         );
-        await transaction.save();
         resp.sendStatus(200);
     })
 );
@@ -122,13 +121,12 @@ router.post(
         );
         if (!transaction) throw new NotFound();
         if (transaction.status !== 2) throw new BadRequest('invalid state');
-        transaction.set(
+        await transaction.update(
             {
                 status: 3,
                 tracking
             }
         );
-        await transaction.save();
         resp.sendStatus(200);
     })
 );
@@ -146,12 +144,11 @@ router.post(
         );
         if (!transaction) throw new NotFound();
         if (transaction.status !== 3) throw new BadRequest('invalid state');
-        transaction.set(
+        await transaction.update(
             {
                 status: 4,
             }
         );
-        await transaction.save();
         resp.sendStatus(200);
     })
 );
