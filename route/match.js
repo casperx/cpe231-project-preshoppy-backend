@@ -11,7 +11,9 @@ router.post(
     '/register/:type',
     eaWrap(async (req, resp) => {
         const { type } = req.params;
-        const { userId, eventId } = req.body;
+        let { userId, eventId } = req.body;
+        userId = parseInt(userId);
+        eventId = parseInt(eventId);
 
         if (type === 'seller') {
             const existsRow = await MatchQueue.findOne(
@@ -38,7 +40,13 @@ router.post(
                 }
             );
             if (existsMatch) {
-                return resp.json(existsMatch);
+                return resp.json(
+                    {
+                        buyerId: existsMatch.buyer,
+                        sellerId: existsMatch.seller,
+                        eventId: existsMatch.event,
+                    }
+                );
             }
 
             const existsSeller = await MatchQueue.findOne(
@@ -54,16 +62,16 @@ router.post(
 
             await Match.create(
                 {
-                    buyer: userId,
-                    seller: existsSeller.user,
-                    event: eventId
+                    buyerId: userId,
+                    sellerId: existsSeller.user,
+                    eventId: eventId
                 }
             );
             resp.status(200).json(
                 {
-                    buyer: userId,
-                    seller: existsSeller.user,
-                    event: eventId
+                    buyerId: userId,
+                    sellerId: existsSeller.user,
+                    eventId: eventId
                 }
             );
         } else {

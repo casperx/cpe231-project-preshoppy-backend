@@ -67,7 +67,7 @@ const UserAddress = sequelize.define(
         name: { type: DataTypes.STRING(100), allowNull: false, field: 'ua_name' },
         address: { type: DataTypes.STRING(500), allowNull: false, field: 'ua_address' },
 
-        tel: { type: DataTypes.STRING(100), allowNull: false, field: 'ua_tel' }
+        tel: { type: DataTypes.STRING(100), field: 'ua_tel' }
     },
     {
         tableName: 'user_address'
@@ -82,10 +82,10 @@ const User = sequelize.define(
         email: { type: DataTypes.STRING(64), allowNull: false, field: 'u_email' },
         password: { type: DataTypes.STRING, allowNull: false, field: 'u_password' },
 
-        firstName: { type: DataTypes.STRING(100), allowNull: false, field: 'u_first_name' },
-        lastName: { type: DataTypes.STRING(100), allowNull: false, field: 'u_last_name' },
+        firstName: { type: DataTypes.STRING(100), field: 'u_first_name' },
+        lastName: { type: DataTypes.STRING(100), field: 'u_last_name' },
 
-        tel: { type: DataTypes.STRING(100), allowNull: false, field: 'u_tel' },
+        tel: { type: DataTypes.STRING(100), field: 'u_tel' },
 
         profilePic: { type: DataTypes.STRING(100), field: 'u_profile_pic' },
 

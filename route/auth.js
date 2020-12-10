@@ -10,18 +10,15 @@ const router = Router();
 router.post(
     '/create',
     eaWrap(async (req, resp) => {
-        const { email, password, firstName, lastName, tel } = req.body;
+        const { email, password } = req.body;
 
-        if (!email || !password || !firstName || !lastName || !tel)
+        if (!email || !password)
             throw new BadRequest('required field is missing');
 
         const cleanEmail = email.trim(),
-            cleanPassword = password.trim(),
-            cleanFirstName = firstName.trim(),
-            cleanLastName = lastName.trim(),
-            cleanTel = tel.trim();
+            cleanPassword = password.trim();
 
-        if (!cleanEmail || !cleanPassword || !cleanFirstName || !cleanLastName || !cleanTel)
+        if (!cleanEmail || !cleanPassword)
             throw new BadRequest('required field is empty');
 
         const emailExists = await User.findOne(
@@ -38,16 +35,12 @@ router.post(
         const newUser = await User.create(
             {
                 email: cleanEmail,
-                password: hashedPassword,
-                firstName: cleanFirstName,
-                lastName: cleanLastName,
-                tel: cleanTel
+                password: hashedPassword
             }
         );
         const newAddress = await UserAddress.create(
             {
-                name: `Home of ${cleanFirstName} ${cleanLastName}`,
-                tel: cleanTel,
+                name: 'Home',
                 address: '123/456 Brooklyn St., Newyork, USA, Zip Code 69696',
                 user: newUser.id
             }
