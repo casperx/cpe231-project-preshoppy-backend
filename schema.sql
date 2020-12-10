@@ -47,7 +47,7 @@ CREATE TABLE `user_address` (
   `ua_id` int(11) NOT NULL AUTO_INCREMENT,
   `ua_name` varchar(100) NOT NULL,
   `ua_address` varchar(500) NOT NULL,
-  `ua_tel` varchar(100) NOT NULL,
+  `ua_tel` varchar(100) DEFAULT NULL,
   `u_id` int(11) NOT NULL,
   PRIMARY KEY (`ua_id`),
   KEY `u_id` (`u_id`),
