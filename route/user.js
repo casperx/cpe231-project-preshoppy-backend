@@ -26,7 +26,7 @@ router.get(
         const res = await User.findOne(
             {
                 where: { id },
-                attributes: ['id', 'firstName', 'lastName', 'email', 'profilePic']
+                attributes: ['id', 'firstName', 'lastName', 'email', 'profilePic', 'tel']
             }
         );
         if (!res) throw new NotFound();
@@ -91,7 +91,7 @@ router.post(
                 where: { id }
             }
         );
-        if (affectedRow === 0) throw new BadRequest();
+        if (affectedRow === 0) throw new BadRequest('nothing changed');
 
         resp.sendStatus(200);
     })
