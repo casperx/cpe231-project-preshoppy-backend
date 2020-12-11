@@ -34,7 +34,7 @@ router.post(
                 attributes: ['address']
             }
         );
-        await Transaction.create(
+        const trans = await Transaction.create(
             {
                 event: eventId,
                 buyer: buyerId,
@@ -44,7 +44,11 @@ router.post(
             }
         );
 
-        resp.sendStatus(200);
+        resp.status(200).send(
+            {
+                id: trans.id
+            }
+        );
     })
 );
 

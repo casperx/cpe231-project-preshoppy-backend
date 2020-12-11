@@ -43,7 +43,7 @@ const uploadPicExtsOpts = {
 };
 
 /* YYYY-MM-DD HH:MM:SS */
-const sqlDateTimePattern = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/;
+const sqlDateTimePattern = /\d{4}-\d{2}-\d{2}\s*(\d{2}:\d{2}:\d{2})?/;
 
 router.post(
     '/add',
@@ -121,6 +121,32 @@ router.post(
 
         /* filter only allow field */
         const updateBody = {};
+
+        if (req.files && req.files.eventPic) {
+            const { eventPic } = req.files;
+
+            /* upload event picture */
+            const dotFileExt = uploadExtChecker(eventPic.name, uploadPicExtsOpts);
+            if (!dotFileExt) throw new BadRequest('file extension is not allowed');
+
+            const oldEvent = await Event.findOne(
+                {
+                    where: { id },
+                    attributes: ['eventPic']
+                }
+            );
+
+            if (oldEvent.eventPic)
+                try {
+                    fs.unlinkSync(eventPicPath(oldEvent.eventPic));
+                } catch (e) {}
+
+            const eventPicFileName = uuid() + dotFileExt;
+            await upload(eventPic, eventPicPath(eventPicFileName));
+
+            updateBody.eventPic = eventPicFileName;
+        }
+
         for (const field of eventEditableFields)
             if (field in rawBody) updateBody[field] = rawBody[field];
 
@@ -134,7 +160,7 @@ router.post(
                 where: { id }
             }
         );
-        if (affectedRow === 0) throw new BadRequest();
+        if (affectedRow === 0) throw new BadRequest('nothing changed');
 
         resp.sendStatus(200);
     })
